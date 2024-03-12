@@ -1,13 +1,17 @@
 
-# github.com/go-sage/synctools
+# [![Mit License][mit-img]][mit] [![GitHub Release][release-img]][release]
 
-The `synctools` module provides a set of packages implementing an opinionated
-but well-oiled mechanism for cleanly managing high concurrency workloads with
-Go.
+``` go
+  import "github.com/go-sage/synctools"
+```
+
+This module provides a set of packages implementing an opinionated but
+well-oiled mechanism for cleanly and efficiently managing high concurrency
+workloads with Go.
 
 ## Provided Packages
 
-### `errgroupx`
+### [![GoDoc][errgroupx-godoc-img]][errgroupx-godoc] `errgroupx`
 
 Package errgroupx provides an opinionated convenience wrapper around package
 [`golang.org/x/sync/errgroup`](https://pkg.go.dev/golang.org/x/sync/errgroup)
@@ -39,3 +43,20 @@ using a coordinated concurrency model. A Pipeline is made up of one or more
 stages each executing a finite (but resizable) set of concurrent goroutines
 that are coordinated using this module's waypoint package.
 
+[mit-img]: http://img.shields.io/badge/License-MIT-c41e3a.svg
+[mit]: https://github.com/go-sage/synctools/blob/main/LICENSE
+
+[release-img]: https://img.shields.io/github/release/go-sage/synctools/all.svg
+[release]: https://github.com/go-sage/synctools/releases
+
+[reportcard-img]: https://goreportcard.com/badge/github.com/go-sage/synctools
+[reportcard]: https://goreportcard.com/report/github.com/go-sage/synctools
+
+[errgroupx-godoc-img]: https://godoc.org/github.com/go-sage/synctools/pkg/errgroupx?status.svg
+[errgroupx-godoc]: https://godoc.org/github.com/go-sage/synctools/pkg/errgroupx
+
+[waypoint-godoc-img]: https://godoc.org/github.com/go-sage/synctools/pkg/waypoint?status.svg
+[waypoint-godoc]: https://godoc.org/github.com/go-sage/synctools/pkg/waypoint
+
+[pipeline-godoc-img]: https://godoc.org/github.com/go-sage/synctools/pkg/pipeline?status.svg
+[pipeline-godoc]: https://godoc.org/github.com/go-sage/synctools/pkg/pipeline
