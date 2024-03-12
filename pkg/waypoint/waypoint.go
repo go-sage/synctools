@@ -201,10 +201,10 @@ func (w *Waypoint) Wait(ctx context.Context) (*Worker, error) {
 // capacity value. A value of -1 is returned if a) the receiver is nil,
 // b) newcap is less than zero, or c) the receiver has been closed.
 //
-// This method may be called at any time on a non-closed Wayopint having
+// This method may be called at any time on a non-closed Waypoint having
 // any number of Workers in any State.
 //
-// If the receiver's capacity is increased by this call, the reciever will
+// If the receiver's capacity is increased by this call, the receiver will
 // activate Waiting workers allowing this new capacity to be consumed. If
 // capacity is reduced, Worker completion will not start new workers until
 // the number of Active Workers drops below the new capacity level.
