@@ -12,12 +12,12 @@ import (
 type stage struct {
 	name     string
 	capacity int
-	pfunc    PipelineFunc
+	sfunc    StageFunc
 	waypt    *waypoint.Waypoint
 }
 
-// runner is an errgroupx.GoFunc as expected by the GoContext method of
-// (*github.com/go-sage/synctools/pkg/errgroupx).Group.
+// runner returns an [errgroupx.GoFunc] as expected by the [GoContext] method
+// of type *errgroupx.Group.
 func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.GoFunc {
 	return func(ctx context.Context) error {
 		defer close(outch)
@@ -46,7 +46,7 @@ func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.GoFunc {
 					defer w.Done()
 					var out any
 
-					if out, err = s.pfunc(ctx, in); err != nil {
+					if out, err = s.sfunc(ctx, in); err != nil {
 						return err
 					}
 
@@ -62,3 +62,6 @@ func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.GoFunc {
 		return eg.Wait()
 	}
 }
+
+// [errgroupx.GoFunc]: https://pkg.go.dev/github.com/go-sage/synctools@v0.1.0/pkg/errgroupx#GoFunc
+// [GoContext]: https://pkg.go.dev/github.com/go-sage/synctools@v0.1.0/pkg/errgroupx#Group.GoContext
