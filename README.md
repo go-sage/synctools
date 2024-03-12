@@ -10,8 +10,8 @@ Go.
 ### `errgroupx`
 
 Package errgroupx provides an opinionated convenience wrapper around package
-`golang.org/x/sync/errgroup` that makes it easier to deal with Groups and
-Contexts in a consistent manner.
+[`golang.org/x/sync/errgroup`](https://pkg.go.dev/golang.org/x/sync/errgroup)
+that makes it easier to deal with Groups and Contexts in a consistent manner.
 
 
 ### `waypoint`
@@ -37,5 +37,5 @@ transitioned to the Finished state.
 Package pipeline provides logic for processing a pipeline of data elements
 using a coordinated concurrency model. A Pipeline is made up of one or more
 stages each executing a finite (but resizable) set of concurrent goroutines
-that are coordinated using this module's [waypoint] package.
+that are coordinated using this module's waypoint package.
 
