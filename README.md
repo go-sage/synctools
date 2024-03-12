@@ -11,14 +11,14 @@ workloads with Go.
 
 ## Provided Packages
 
-### [![GoDoc][errgroupx-godoc-img]][errgroupx-godoc] `errgroupx`
+#### `errgroupx` [![GoDoc][errgroupx-godoc-img]][errgroupx-godoc]
 
 Package errgroupx provides an opinionated convenience wrapper around package
 [`golang.org/x/sync/errgroup`](https://pkg.go.dev/golang.org/x/sync/errgroup)
 that makes it easier to deal with Groups and Contexts in a consistent manner.
 
 
-### `waypoint`
+#### `waypoint` [![GoDoc][waypoint-godoc-img]][waypoint-godoc]
 
 Package waypoint implements an opinionated scheme for coordinating limited
 concurrency over a variably-sized set of cooperating callers. This is
@@ -36,7 +36,7 @@ capacity. Workers wishing to become Active while a Waypoint is at (or above)
 its set capacity are blocked until one or more currently Active Workers are
 transitioned to the Finished state.
 
-### `pipeline`
+#### `pipeline` [![GoDoc][pipeline-godoc-img]][pipeline-godoc]
 
 Package pipeline provides logic for processing a pipeline of data elements
 using a coordinated concurrency model. A Pipeline is made up of one or more
