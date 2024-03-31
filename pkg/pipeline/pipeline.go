@@ -9,12 +9,15 @@ package pipeline
 import (
 	"context"
 	"sync"
+
+	"github.com/go-sage/synctools/pkg/errgroupx"
 )
 
 type (
 	Pipeline struct {
 		impl    Interface
 		stages  []stage
+		funcs   []errgroupx.ContextFunc
 		byname  map[string]int
 		started bool
 
@@ -24,13 +27,15 @@ type (
 	mutex = sync.Mutex
 )
 
-// Interface should be implemented by types written to provide the data source
-// and sink for a given Pipeline.
+// Interface defines methods that should be implemented by types written to
+// provide the data source and sink for a given Pipeline.
 type Interface interface {
-	// Feed provides the data source for a Pipeline by sending data elements
-	// into the provided channel. It is the responsibility of the implementor
-	// to close this channel once all data has been provided, otherwise the
-	// Pipeline will never end.
+	// The Feed methods acts as the data source for a Pipeline by sending data
+	// elements into the provided channel. The Pipeine will take care of closing
+	// wchan as soon as this method returns.
+	//
+	// NOTE: The implementor should not close this channel; doing so will cause
+	// a panic.
 	Feed(ctx context.Context, wchan chan<- any) error
 
 	// A Collect method acts as the data sink for the Pipeline by receiving
@@ -118,6 +123,16 @@ func (p *Pipeline) Resize(name string, newcap int) (int, error) {
 
 	return p.stages[ndx].waypt.Resize(newcap), nil
 
+}
+
+// GoContext adds cfunc to the list of ContextFuncs that will be executed
+// (each in their own goroutine) alongside Pipeline-specific goroutines when
+// the receiver's Run method is called. Note that, while this ContextFunc is
+// separate from the goroutines executing the pipline, an error returned from
+// this function will cause the pipeline to fail. Therefore, only execute
+// goroutines with this method if that is your intent.
+func (p *Pipeline) GoContext(cfunc errgroupx.ContextFunc) {
+	p.funcs = append(p.funcs, cfunc)
 }
 
 // [waypoint]: https://pkg.go.dev/github.com/go-sage/synctools/pkg/waypoint

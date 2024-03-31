@@ -16,9 +16,9 @@ type stage struct {
 	waypt    *waypoint.Waypoint
 }
 
-// runner returns an [errgroupx.GoFunc] as expected by the [GoContext] method
+// runner returns an [errgroupx.ContextFunc] as expected by the [GoContext] method
 // of type *errgroupx.Group.
-func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.GoFunc {
+func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.ContextFunc {
 	return func(ctx context.Context) error {
 		defer close(outch)
 
@@ -63,5 +63,5 @@ func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.GoFunc {
 	}
 }
 
-// [errgroupx.GoFunc]: https://pkg.go.dev/github.com/go-sage/synctools@v0.1.0/pkg/errgroupx#GoFunc
+// [errgroupx.ContextFunc]: https://pkg.go.dev/github.com/go-sage/synctools@v0.1.0/pkg/errgroupx#ContextFunc
 // [GoContext]: https://pkg.go.dev/github.com/go-sage/synctools@v0.1.0/pkg/errgroupx#Group.GoContext

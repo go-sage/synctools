@@ -29,17 +29,33 @@ func (p *Pipeline) Run(ctx context.Context) error {
 		return ErrNilReceiver
 	}
 
+	eg, err := p.run(ctx)
+	if err != nil {
+		return err
+	}
+	return eg.Wait()
+}
+
+// run exists as a separate method so we can Lock the receiver, set things
+// up, Unlock the reciever, then return the *errgroupx.Group so that Run can
+// call its Wait method without holding the receiver's lock for way too long.
+func (p *Pipeline) run(ctx context.Context) (*errgroupx.Group, error) {
 	p.Lock()
 	defer p.Unlock()
 
 	if len(p.stages) == 0 {
-		return ErrNoStages
+		p.Unlock()
+		return nil, ErrNoStages
 	}
 
 	p.started = true
 
 	eg, ctx, cancel := errgroupx.New(ctx)
 	defer cancel()
+
+	for _, cf := range p.funcs {
+		eg.GoContext(ctx, cf)
+	}
 
 	inch := make(chan any)
 	eg.GoContext(ctx, p.feedFunc(inch))
@@ -54,24 +70,23 @@ func (p *Pipeline) Run(ctx context.Context) error {
 		last = ch
 	}
 
-	// outch := make(chan any)
-	// eg.GoContext(ctx, copyRunner(last, outch))
 	eg.GoContext(ctx, p.collectFunc(last))
 
-	return eg.Wait()
+	return eg, nil
 }
 
-// feedFunc returns an errgroupx.GoFunc that executes the receiver's
+// feedFunc returns an errgroupx.ContextFunc that executes the receiver's
 // Interface.Feed method in order to send data to the given channel.
-func (p *Pipeline) feedFunc(ch chan<- any) errgroupx.GoFunc {
+func (p *Pipeline) feedFunc(ch chan<- any) errgroupx.ContextFunc {
 	return func(ctx context.Context) error {
+		defer close(ch)
 		return p.impl.Feed(ctx, ch)
 	}
 }
 
-// collectFunc returns an errgroupx.GoFunc that executes the receiver's
+// collectFunc returns an errgroupx.ContextFunc that executes the receiver's
 // Interface.Collect method in order to receive data from the given channel.
-func (p *Pipeline) collectFunc(ch <-chan any) errgroupx.GoFunc {
+func (p *Pipeline) collectFunc(ch <-chan any) errgroupx.ContextFunc {
 	return func(ctx context.Context) error {
 		return p.impl.Collect(ctx, ch)
 	}
