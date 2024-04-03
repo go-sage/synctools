@@ -29,29 +29,35 @@ func (p *Pipeline) Run(ctx context.Context) error {
 		return ErrNilReceiver
 	}
 
-	eg, err := p.run(ctx)
+	eg, cancel, err := p.run(ctx)
 	if err != nil {
 		return err
 	}
+
+	defer cancel()
+
 	return eg.Wait()
 }
 
 // run exists as a separate method so we can Lock the receiver, set things
 // up, Unlock the reciever, then return the *errgroupx.Group so that Run can
 // call its Wait method without holding the receiver's lock for way too long.
-func (p *Pipeline) run(ctx context.Context) (*errgroupx.Group, error) {
+func (p *Pipeline) run(ctx context.Context) (*errgroupx.Group, context.CancelFunc, error) {
 	p.Lock()
 	defer p.Unlock()
 
 	if len(p.stages) == 0 {
 		p.Unlock()
-		return nil, ErrNoStages
+		return nil, nil, ErrNoStages
 	}
 
 	p.started = true
 
-	eg, ctx, cancel := errgroupx.New(ctx)
-	defer cancel()
+	eg, ctx, cancel := errgroupx.WithCancel(ctx)
+	// n.b. We won't defer the call to 'cancel' here; instead, we'll
+	//      return it -- since we don't want ctx to get canceled until
+	//      the *caller* returns (otherwise, the Context passed to all
+	//      of the pipeline stages will have already been canceled.
 
 	for _, cf := range p.funcs {
 		eg.GoContext(ctx, cf)
@@ -72,7 +78,7 @@ func (p *Pipeline) run(ctx context.Context) (*errgroupx.Group, error) {
 
 	eg.GoContext(ctx, p.collectFunc(last))
 
-	return eg, nil
+	return eg, cancel, nil
 }
 
 // feedFunc returns an errgroupx.ContextFunc that executes the receiver's
