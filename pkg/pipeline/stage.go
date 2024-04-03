@@ -17,13 +17,13 @@ type stage struct {
 }
 
 // runner returns an [errgroupx.ContextFunc] as expected by the [GoContext] method
-// of type *errgroupx.Group.
+// on type *errgroupx.Group.
 func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.ContextFunc {
 	return func(ctx context.Context) error {
 		defer close(outch)
 
 		s.waypt = waypoint.New(s.capacity)
-		eg, ctx, cancel := errgroupx.New(ctx)
+		eg, ctx, cancel := errgroupx.WithContext(ctx)
 		defer cancel()
 
 		const errInputDone = errstr("no more input")
