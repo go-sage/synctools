@@ -23,7 +23,7 @@ func (s *stage) runner(inch <-chan any, outch chan<- any) errgroupx.ContextFunc 
 		defer close(outch)
 
 		s.waypt = waypoint.New(s.capacity)
-		eg, ctx, cancel := errgroupx.WithContext(ctx)
+		eg, ctx, cancel := errgroupx.WithCancel(ctx)
 		defer cancel()
 
 		const errInputDone = errstr("no more input")
